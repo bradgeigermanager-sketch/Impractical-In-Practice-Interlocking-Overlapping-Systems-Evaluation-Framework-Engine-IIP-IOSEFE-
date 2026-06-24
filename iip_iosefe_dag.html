@@ -441,7 +441,26 @@ nodes.forEach(n => {
     d.fx = null;
     d.fy = null;
   }
+  
+  function generateFractalInputsForNode(node) {
+  // Example synthetic scale series
+  const scales = [1.0, 0.5, 0.25, 0.125];
+  const counts = scales.map(s => Math.floor(10 / s)); // simple box-counting proxy
 
+  const patterns = scales.map((s, i) => ({
+    scale: s,
+    features: [
+      Math.sin(i + 1) * 0.5 + 1,
+      Math.cos(i + 2) * 0.3 + 1,
+      (i + 1) * 0.1
+    ]
+  }));
+
+  const boundaryLengths = [10, 11.2, 12.8, 14.1];
+
+  return { scales, counts, patterns, boundaryLengths };
+  }
+  
   // --- Info panel wiring ---
   const infoPanel = document.getElementById("info-panel");
 
