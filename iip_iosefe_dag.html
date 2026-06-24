@@ -384,6 +384,16 @@ function edgeGlow(roughness) {
   edge.fractal = metrics;
 });
 
+  link
+  .attr("stroke", d => edgeColor(d.fractal.fractalInstabilityIndex))
+  .attr("stroke-width", d => edgeWidth(d.fractal.fractalDimension))
+  .attr("stroke-dasharray", d => edgeDash(d.fractal.selfSimilarityIndex))
+  .style("filter", d =>
+    edgeGlow(d.fractal.boundaryRoughness)
+      ? `drop-shadow(0 0 ${8 * edgeGlow(d.fractal.boundaryRoughness)}px rgba(56,189,248,${edgeGlow(d.fractal.boundaryRoughness)}))`
+      : "none"
+  );
+
   // --- Impose a coarse DAG ordering between main nodes (pipeline order) ---
   const mainOrder = [
     "ING-01",
