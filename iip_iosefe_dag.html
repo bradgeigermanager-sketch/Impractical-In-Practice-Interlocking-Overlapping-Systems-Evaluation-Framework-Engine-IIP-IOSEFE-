@@ -292,6 +292,23 @@ nodes.forEach(n => {
   };
   }
 
+  function computeFractalCorrelationMatrix(nodes, links) {
+  const entities = [...nodes, ...links];
+  const vectors = entities.map(e => fractalVector(e));
+
+  const matrix = [];
+
+  for (let i = 0; i < entities.length; i++) {
+    const row = [];
+    for (let j = 0; j < entities.length; j++) {
+      row.push(correlation(vectors[i], vectors[j]));
+    }
+    matrix.push(row);
+  }
+
+  return { entities, matrix };
+  }
+
   function correlation(a: number[], b: number[]): number {
   const n = a.length;
   const meanA = a.reduce((x, y) => x + y, 0) / n;
