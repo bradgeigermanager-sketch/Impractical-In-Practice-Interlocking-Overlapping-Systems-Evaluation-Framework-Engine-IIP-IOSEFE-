@@ -262,6 +262,29 @@ nodes.forEach(n => {
   };
 });
 
+  function computeGlobalFractalField(nodes, links) {
+  const values = [];
+
+  nodes.forEach(n => {
+    if (n.fractal?.fractalInstabilityIndex != null) {
+      values.push(n.fractal.fractalInstabilityIndex);
+    }
+  });
+
+  links.forEach(l => {
+    if (l.fractal?.fractalInstabilityIndex != null) {
+      values.push(l.fractal.fractalInstabilityIndex);
+    }
+  });
+
+  if (values.length === 0) return { min: 0, max: 1 };
+
+  return {
+    min: Math.min(...values),
+    max: Math.max(...values)
+  };
+  }
+
   function edgeColor(fii) {
   if (fii === null) return "#4b5563";
   if (fii < 0.4) return "#22c55e";   // stable
