@@ -972,6 +972,12 @@ simulation.on("tick", () => {
 
     simulation.on("tick", () => {
   renderFractalHeatmap();
+
+  simulation.on("tick", () => {
+  // existing updates...
+  renderClusterHulls();
+});
+      
   // existing node/edge updates...
 });
   });
