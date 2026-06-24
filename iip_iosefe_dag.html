@@ -550,6 +550,11 @@ function edgeGlow(roughness) {
   if (roughness === null) return 0.0;
   return Math.min(0.6, roughness * 0.4);
 }
+
+simulation.on("tick", () => {
+  renderFractalCorrelationLines();
+  renderCorrelationHalos();
+});
   
   // --- Parse CSV into rows ---
   function parseCSV(text) {
