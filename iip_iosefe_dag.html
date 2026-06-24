@@ -259,6 +259,30 @@ nodes.forEach(n => {
     fractalInstabilityIndex: null
   };
 });
+
+  function edgeColor(fii) {
+  if (fii === null) return "#4b5563";
+  if (fii < 0.4) return "#22c55e";   // stable
+  if (fii < 0.8) return "#facc15";   // semi-stable
+  return "#ef4444";                  // unstable
+}
+
+function edgeWidth(dimension) {
+  if (dimension === null) return 1.2;
+  return 1.2 + dimension * 1.5;
+}
+
+function edgeDash(ssi) {
+  if (ssi === null) return "0,0";
+  if (ssi > 0.8) return "1,0";       // solid
+  if (ssi > 0.4) return "4,2";       // medium
+  return "2,4";                      // highly recursive
+}
+
+function edgeGlow(roughness) {
+  if (roughness === null) return 0.0;
+  return Math.min(0.6, roughness * 0.4);
+}
   
   // --- Parse CSV into rows ---
   function parseCSV(text) {
