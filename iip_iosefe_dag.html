@@ -243,6 +243,23 @@ OUT-01,Output Assembly Engine,OUT-01-06,Feasibility Verdict Generator
 OUT-01,Output Assembly Engine,OUT-01-07,Intervention Recommendation Packager
 `.trim();
 
+import {
+  computeFractalMetrics,
+  fractalDimensionBoxCount,
+  selfSimilarityIndex,
+  boundaryRoughness
+} from "./fractalMathEngine.js";
+
+// Attach fractal metrics placeholder to each node
+nodes.forEach(n => {
+  n.fractal = {
+    fractalDimension: null,
+    selfSimilarityIndex: null,
+    boundaryRoughness: null,
+    fractalInstabilityIndex: null
+  };
+});
+  
   // --- Parse CSV into rows ---
   function parseCSV(text) {
     const lines = text.split(/\r?\n/);
