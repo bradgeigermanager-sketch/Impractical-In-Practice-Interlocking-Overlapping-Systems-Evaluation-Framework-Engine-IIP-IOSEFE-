@@ -558,6 +558,8 @@ function edgeGlow(roughness) {
     .force("collision", d3.forceCollide().radius(d => d.type === "main" ? 22 : 14))
     .alphaDecay(0.02);
 
+  heatmapLayer.attr("filter", "url(#fractal-blur)");
+
   const link = svg.append("g")
     .attr("stroke-linecap", "round")
     .selectAll("line")
