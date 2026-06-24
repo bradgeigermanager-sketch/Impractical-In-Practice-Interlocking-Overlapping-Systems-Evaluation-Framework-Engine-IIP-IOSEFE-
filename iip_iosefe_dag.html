@@ -565,6 +565,27 @@ function edgeGlow(roughness) {
     title.textContent = "Node Details";
     infoPanel.appendChild(title);
 
+    if (d.source && d.target) {
+  const fractalHeader = document.createElement("div");
+  fractalHeader.className = "label";
+  fractalHeader.textContent = "Fractal Edge Metrics";
+  infoPanel.appendChild(fractalHeader);
+
+  function addEdgeMetric(label, value) {
+    const row = document.createElement("div");
+    row.className = "metric";
+    row.innerHTML = `<span>${label}</span><span class="value">${
+      value === null ? "—" : value.toFixed(4)
+    }</span>`;
+    infoPanel.appendChild(row);
+  }
+
+  addEdgeMetric("Fractal Dimension (Dᶠ)", d.fractal.fractalDimension);
+  addEdgeMetric("Self-Similarity Index (SSI)", d.fractal.selfSimilarityIndex);
+  addEdgeMetric("Boundary Roughness (Bᵣ)", d.fractal.boundaryRoughness);
+  addEdgeMetric("Fractal Instability Index (FII)", d.fractal.fractalInstabilityIndex);
+    }
+
     const badgeRow = document.createElement("div");
     const badge = document.createElement("span");
     badge.className = "badge " + (nodeData.type === "main" ? "main" : "sub");
