@@ -1,0 +1,70 @@
+NodeID,NodeName,SubComponentID,SubComponentName
+ING-01,System Ingestion Layer,ING-01-01,Raw System Definition Loader
+ING-01,System Ingestion Layer,ING-01-02,Process Map Importer
+ING-01,System Ingestion Layer,ING-01-03,Constraint Schema Normalizer
+ING-01,System Ingestion Layer,ING-01-04,Dependency Declaration Extractor
+ING-01,System Ingestion Layer,ING-01-05,Authority Boundary Parser
+ING-01,System Ingestion Layer,ING-01-06,Assumption Surface Extractor
+
+ING-02,System Normalization Engine,ING-02-01,Terminology Harmonizer
+ING-02,System Normalization Engine,ING-02-02,Constraint Canonicalizer
+ING-02,System Normalization Engine,ING-02-03,Process Step Unifier
+ING-02,System Normalization Engine,ING-02-04,Dependency Graph Normalizer
+ING-02,System Normalization Engine,ING-02-05,Role/Actor Normalizer
+
+MAP-01,Interlock Mapping Engine,MAP-01-01,Circular Dependency Detector
+MAP-01,Interlock Mapping Engine,MAP-01-02,Mutual Blocking Condition Scanner
+MAP-01,Interlock Mapping Engine,MAP-01-03,Sequential Impossibility Checker
+MAP-01,Interlock Mapping Engine,MAP-01-04,Timing Interlock Analyzer
+MAP-01,Interlock Mapping Engine,MAP-01-05,Resource Interlock Analyzer
+MAP-01,Interlock Mapping Engine,MAP-01-06,Authority Interlock Analyzer
+
+MAP-02,Overlap Mapping Engine,MAP-02-01,Jurisdiction Overlap Detector
+MAP-02,Overlap Mapping Engine,MAP-02-02,Process Redundancy Mapper
+MAP-02,Overlap Mapping Engine,MAP-02-03,Contradictory Rule Detector
+MAP-02,Overlap Mapping Engine,MAP-02-04,Responsibility Collision Analyzer
+MAP-02,Overlap Mapping Engine,MAP-02-05,Overlapping Workflow Segment Extractor
+
+MAP-03,Constraint Conflict Engine,MAP-03-01,Hard Constraint Clash Detector
+MAP-03,Constraint Conflict Engine,MAP-03-02,Soft Constraint Tension Analyzer
+MAP-03,Constraint Conflict Engine,MAP-03-03,Unfulfillable Requirement Detector
+MAP-03,Constraint Conflict Engine,MAP-03-04,Constraint Propagation Analyzer
+MAP-03,Constraint Conflict Engine,MAP-03-05,Constraint Contradiction Mapper
+
+STR-01,Practicality Stress Tester,STR-01-01,Resource Scarcity Simulator
+STR-01,Practicality Stress Tester,STR-01-02,Timing Variability Simulator
+STR-01,Practicality Stress Tester,STR-01-03,Human Factor Drift Modeler
+STR-01,Practicality Stress Tester,STR-01-04,Environmental Variability Simulator
+STR-01,Practicality Stress Tester,STR-01-05,Execution Phase Divergence Analyzer
+
+SIG-01,Impracticality Signal Extractor,SIG-01-01,Impracticality Index Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-02,Interlock Severity Score Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-03,Overlap Friction Coefficient Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-04,Real-World Feasibility Probability Estimator
+SIG-01,Impracticality Signal Extractor,SIG-01-05,Constraint Contradiction Intensity Score
+
+CAS-01,Cascade Propagation Modeler,CAS-01-01,Interlock Cascade Simulator
+CAS-01,Cascade Propagation Modeler,CAS-01-02,Overlap Cascade Simulator
+CAS-01,Cascade Propagation Modeler,CAS-01-03,Constraint Failure Propagation Engine
+CAS-01,Cascade Propagation Modeler,CAS-01-04,Choke Point Identifier
+CAS-01,Cascade Propagation Modeler,CAS-01-05,Cascade Trigger Detector
+
+RES-01,Resolution Pathway Generator,RES-01-01,Decoupling Strategy Generator
+RES-01,Resolution Pathway Generator,RES-01-02,Constraint Relaxation Recommender
+RES-01,Resolution Pathway Generator,RES-01-03,Process Re-sequencing Planner
+RES-01,Resolution Pathway Generator,RES-01-04,Authority Realignment Planner
+RES-01,Resolution Pathway Generator,RES-01-05,Redundancy Elimination Planner
+
+META-01,Meta-Stability Evaluator,META-01-01,Post-Fix Stability Simulator
+META-01,Meta-Stability Evaluator,META-01-02,Residual Interlock Detector
+META-01,Meta-Stability Evaluator,META-01-03,Residual Overlap Detector
+META-01,Meta-Stability Evaluator,META-01-04,Stability Probability Estimator
+META-01,Meta-Stability Evaluator,META-01-05,Long-Term Drift Analyzer
+
+OUT-01,Output Assembly Engine,OUT-01-01,Interlock Graph Builder
+OUT-01,Output Assembly Engine,OUT-01-02,Overlap Matrix Builder
+OUT-01,Output Assembly Engine,OUT-01-03,Constraint Contradiction Map Builder
+OUT-01,Output Assembly Engine,OUT-01-04,Practicality Stress Curve Generator
+OUT-01,Output Assembly Engine,OUT-01-05,Cascade Propagation Tree Builder
+OUT-01,Output Assembly Engine,OUT-01-06,Feasibility Verdict Generator
+OUT-01,Output Assembly Engine,OUT-01-07,Intervention Recommendation Packager
