@@ -1,0 +1,11 @@
+NodeID,NodeName,SubComponentID,SubComponentName
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-01,Fractal Signature Extractor
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-02,Self-Similarity Detector
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-03,Fractal Dimension Calculator
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-04,Recursive Interlock Pattern Mapper
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-05,Scale-Invariant Overlap Analyzer
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-06,Fractal Instability Index Generator
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-07,Fractal Cascade Amplification Modeler
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-08,Fractal Boundary Roughness Estimator
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-09,Fractal Attractor Classification Engine
+FRA-01,Fractal Impracticality Analysis Layer,FRA-01-10,Fractal Divergence Hotspot Locator
