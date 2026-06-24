@@ -605,6 +605,8 @@ function edgeGlow(roughness) {
   return Math.min(0.6, roughness * 0.4);
 }
 
+assignFractalClusters(nodes, links, 0.75);
+
 simulation.on("tick", () => {
   renderFractalCorrelationLines();
   renderCorrelationHalos();
