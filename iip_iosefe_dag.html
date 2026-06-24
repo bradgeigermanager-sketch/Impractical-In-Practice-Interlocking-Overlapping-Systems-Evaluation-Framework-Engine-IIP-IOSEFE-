@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IIP‑IOSEFE DAG Visualization</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #05060a;
+      color: #e5e7eb;
+      overflow: hidden;
+    }
+    #app {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      padding: 8px 16px;
+      background: #0b0f1a;
+      border-bottom: 1px solid #1f2933;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #9ca3af;
+    }
+    header .meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    #graph-container {
+      flex: 1;
+      position: relative;
+    }
+    svg {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at top, #111827 0, #020617 55%, #000 100%);
+    }
+    .link {
+      stroke: #4b5563;
+      stroke-opacity: 0.35;
+      stroke-width: 1.1px;
+      marker-end: url(#arrow);
+    }
+    .node-main circle {
+      r: 10;
+      fill: #22c55e;
+      stroke: #bbf7d0;
+      stroke-width: 1.4px;
+    }
+    .node-sub circle {
+      r: 6;
+      fill: #38bdf8;
+      stroke: #e0f2fe;
+      stroke-width: 1.1px;
+    }
+    .node-main text {
+      font-size: 11px;
+      fill: #e5e7eb;
+      pointer-events: none;
+    }
+    .node-sub text {
+      font-size: 9px;
+      fill: #9ca3af;
+      pointer-events: none;
+    }
+    .node:hover circle {
+      stroke-width: 2px;
+      filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.9));
+    }
+    #info-panel {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      width: 260px;
+      max-height: calc(100% - 24px);
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 10px;
+      border: 1px solid #1f2937;
+      padding: 10px 12px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+      font-size: 12px;
+      overflow-y: auto;
+    }
+    #info-panel h2 {
+      margin: 0 0 6px 0;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #9ca3af;
+    }
+    #info-panel .label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+    #info-panel .value {
+      font-size: 12px;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+    #info-panel .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      margin-right: 4px;
+      margin-top: 4px;
+    }
+    #info-panel .badge.main {
+      border-color: #22c55e;
+      color: #bbf7d0;
+    }
+    #info-panel .badge.sub {
+      border-color: #38bdf8;
+      color: #bae6fd;
+    }
+    #info-panel .metric {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+    #info-panel .metric span.value {
+      color: #e5e7eb;
+      font-variant-numeric: tabular-nums;
+    }
+    #info-panel .hint {
+      margin-top: 8px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>IIP‑IOSEFE DAG • Impractical‑In‑Practice Interlocking/Overlapping Systems Evaluation Engine</h1>
+    <div class="meta">
+      <div>Nodes: <span id="meta-nodes">0</span></div>
+      <div>Edges: <span id="meta-edges">0</span></div>
+    </div>
+  </header>
+  <div id="graph-container">
+    <svg id="graph"></svg>
+    <div id="info-panel">
+      <h2>Node Details</h2>
+      <div class="label">Status</div>
+      <div class="value">Hover or click a node to inspect its role in the engine.</div>
+      <div class="hint">Green = main engine node, Blue = sub‑component node.</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+  // --- CSV representation of the DAG (nodes + sub-components) ---
+  const csvData = `
+NodeID,NodeName,SubComponentID,SubComponentName
+ING-01,System Ingestion Layer,ING-01-01,Raw System Definition Loader
+ING-01,System Ingestion Layer,ING-01-02,Process Map Importer
+ING-01,System Ingestion Layer,ING-01-03,Constraint Schema Normalizer
+ING-01,System Ingestion Layer,ING-01-04,Dependency Declaration Extractor
+ING-01,System Ingestion Layer,ING-01-05,Authority Boundary Parser
+ING-01,System Ingestion Layer,ING-01-06,Assumption Surface Extractor
+ING-02,System Normalization Engine,ING-02-01,Terminology Harmonizer
+ING-02,System Normalization Engine,ING-02-02,Constraint Canonicalizer
+ING-02,System Normalization Engine,ING-02-03,Process Step Unifier
+ING-02,System Normalization Engine,ING-02-04,Dependency Graph Normalizer
+ING-02,System Normalization Engine,ING-02-05,Role/Actor Normalizer
+MAP-01,Interlock Mapping Engine,MAP-01-01,Circular Dependency Detector
+MAP-01,Interlock Mapping Engine,MAP-01-02,Mutual Blocking Condition Scanner
+MAP-01,Interlock Mapping Engine,MAP-01-03,Sequential Impossibility Checker
+MAP-01,Interlock Mapping Engine,MAP-01-04,Timing Interlock Analyzer
+MAP-01,Interlock Mapping Engine,MAP-01-05,Resource Interlock Analyzer
+MAP-01,Interlock Mapping Engine,MAP-01-06,Authority Interlock Analyzer
+MAP-02,Overlap Mapping Engine,MAP-02-01,Jurisdiction Overlap Detector
+MAP-02,Overlap Mapping Engine,MAP-02-02,Process Redundancy Mapper
+MAP-02,Overlap Mapping Engine,MAP-02-03,Contradictory Rule Detector
+MAP-02,Overlap Mapping Engine,MAP-02-04,Responsibility Collision Analyzer
+MAP-02,Overlap Mapping Engine,MAP-02-05,Overlapping Workflow Segment Extractor
+MAP-03,Constraint Conflict Engine,MAP-03-01,Hard Constraint Clash Detector
+MAP-03,Constraint Conflict Engine,MAP-03-02,Soft Constraint Tension Analyzer
+MAP-03,Constraint Conflict Engine,MAP-03-03,Unfulfillable Requirement Detector
+MAP-03,Constraint Conflict Engine,MAP-03-04,Constraint Propagation Analyzer
+MAP-03,Constraint Conflict Engine,MAP-03-05,Constraint Contradiction Mapper
+STR-01,Practicality Stress Tester,STR-01-01,Resource Scarcity Simulator
+STR-01,Practicality Stress Tester,STR-01-02,Timing Variability Simulator
+STR-01,Practicality Stress Tester,STR-01-03,Human Factor Drift Modeler
+STR-01,Practicality Stress Tester,STR-01-04,Environmental Variability Simulator
+STR-01,Practicality Stress Tester,STR-01-05,Execution Phase Divergence Analyzer
+SIG-01,Impracticality Signal Extractor,SIG-01-01,Impracticality Index Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-02,Interlock Severity Score Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-03,Overlap Friction Coefficient Calculator
+SIG-01,Impracticality Signal Extractor,SIG-01-04,Real-World Feasibility Probability Estimator
+SIG-01,Impracticality Signal Extractor,SIG-01-05,Constraint Contradiction Intensity Score
+CAS-01,Cascade Propagation Modeler,CAS-01-01,Interlock Cascade Simulator
+CAS-01,Cascade Propagation Modeler,CAS-01-02,Overlap Cascade Simulator
+CAS-01,Cascade Propagation Modeler,CAS-01-03,Constraint Failure Propagation Engine
+CAS-01,Cascade Propagation Modeler,CAS-01-04,Choke Point Identifier
+CAS-01,Cascade Propagation Modeler,CAS-01-05,Cascade Trigger Detector
+RES-01,Resolution Pathway Generator,RES-01-01,Decoupling Strategy Generator
+RES-01,Resolution Pathway Generator,RES-01-02,Constraint Relaxation Recommender
+RES-01,Resolution Pathway Generator,RES-01-03,Process Re-sequencing Planner
+RES-01,Resolution Pathway Generator,RES-01-04,Authority Realignment Planner
+RES-01,Resolution Pathway Generator,RES-01-05,Redundancy Elimination Planner
+META-01,Meta-Stability Evaluator,META-01-01,Post-Fix Stability Simulator
+META-01,Meta-Stability Evaluator,META-01-02,Residual Interlock Detector
+META-01,Meta-Stability Evaluator,META-01-03,Residual Overlap Detector
+META-01,Meta-Stability Evaluator,META-01-04,Stability Probability Estimator
+META-01,Meta-Stability Evaluator,META-01-05,Long-Term Drift Analyzer
+OUT-01,Output Assembly Engine,OUT-01-01,Interlock Graph Builder
+OUT-01,Output Assembly Engine,OUT-01-02,Overlap Matrix Builder
+OUT-01,Output Assembly Engine,OUT-01-03,Constraint Contradiction Map Builder
+OUT-01,Output Assembly Engine,OUT-01-04,Practicality Stress Curve Generator
+OUT-01,Output Assembly Engine,OUT-01-05,Cascade Propagation Tree Builder
+OUT-01,Output Assembly Engine,OUT-01-06,Feasibility Verdict Generator
+OUT-01,Output Assembly Engine,OUT-01-07,Intervention Recommendation Packager
+`.trim();
+
+  // --- Parse CSV into rows ---
+  function parseCSV(text) {
+    const lines = text.split(/\r?\n/);
+    const header = lines[0].split(",");
+    return lines.slice(1).map(line => {
+      const cols = [];
+      let current = "";
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (c === '"' && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (c === '"') {
+          inQuotes = !inQuotes;
+        } else if (c === "," && !inQuotes) {
+          cols.push(current);
+          current = "";
+        } else {
+          current += c;
+        }
+      }
+      cols.push(current);
+      const obj = {};
+      header.forEach((h, idx) => obj[h.trim()] = (cols[idx] || "").trim());
+      return obj;
+    });
+  }
+
+  const rows = parseCSV(csvData);
+
+  // --- Build nodes and edges ---
+  const nodeMap = new Map();
+  const nodes = [];
+  const links = [];
+
+  function ensureNode(id, label, type, parentId = null) {
+    if (!nodeMap.has(id)) {
+      const node = {
+        id,
+        label,
+        type,       // "main" or "sub"
+        parentId,
+      };
+      nodeMap.set(id, node);
+      nodes.push(node);
+    }
+    return nodeMap.get(id);
+  }
+
+  rows.forEach(row => {
+    const mainId = row.NodeID;
+    const mainName = row.NodeName;
+    const subId = row.SubComponentID;
+    const subName = row.SubComponentName;
+
+    const mainNode = ensureNode(mainId, mainName, "main", null);
+    const subNode = ensureNode(subId, subName, "sub", mainId);
+
+    links.push({
+      source: mainNode.id,
+      target: subNode.id,
+      kind: "contains"
+    });
+  });
+
+  // --- Impose a coarse DAG ordering between main nodes (pipeline order) ---
+  const mainOrder = [
+    "ING-01",
+    "ING-02",
+    "MAP-01",
+    "MAP-02",
+    "MAP-03",
+    "STR-01",
+    "SIG-01",
+    "CAS-01",
+    "RES-01",
+    "META-01",
+    "OUT-01"
+  ];
+  for (let i = 0; i < mainOrder.length - 1; i++) {
+    const from = mainOrder[i];
+    const to = mainOrder[i + 1];
+    if (nodeMap.has(from) && nodeMap.has(to)) {
+      links.push({
+        source: from,
+        target: to,
+        kind: "flow"
+      });
+    }
+  }
+
+  // --- Update meta counts ---
+  document.getElementById("meta-nodes").textContent = nodes.length;
+  document.getElementById("meta-edges").textContent = links.length;
+
+  // --- D3 Force-Directed Graph ---
+  const svg = d3.select("#graph");
+  const width = window.innerWidth;
+  const height = window.innerHeight - 40;
+
+  svg.attr("viewBox", [0, 0, width, height]);
+
+  // Arrow marker
+  const defs = svg.append("defs");
+  defs.append("marker")
+    .attr("id", "arrow")
+    .attr("viewBox", "0 -5 10 10")
+    .attr("refX", 14)
+    .attr("refY", 0)
+    .attr("markerWidth", 5)
+    .attr("markerHeight", 5)
+    .attr("orient", "auto")
+    .append("path")
+    .attr("d", "M0,-5L10,0L0,5")
+    .attr("fill", "#4b5563")
+    .attr("fill-opacity", 0.7);
+
+  const simulation = d3.forceSimulation(nodes)
+    .force("link", d3.forceLink(links)
+      .id(d => d.id)
+      .distance(d => d.kind === "flow" ? 120 : 60)
+      .strength(d => d.kind === "flow" ? 0.4 : 0.9))
+    .force("charge", d3.forceManyBody().strength(-260))
+    .force("center", d3.forceCenter(width / 2, height / 2))
+    .force("collision", d3.forceCollide().radius(d => d.type === "main" ? 22 : 14))
+    .alphaDecay(0.02);
+
+  const link = svg.append("g")
+    .attr("stroke-linecap", "round")
+    .selectAll("line")
+    .data(links)
+    .join("line")
+    .attr("class", "link")
+    .attr("stroke-dasharray", d => d.kind === "flow" ? "3,3" : "0,0")
+    .attr("stroke-width", d => d.kind === "flow" ? 1.2 : 1.0);
+
+  const node = svg.append("g")
+    .selectAll("g")
+    .data(nodes)
+    .join("g")
+    .attr("class", d => "node " + (d.type === "main" ? "node-main" : "node-sub"))
+    .call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
+
+  node.append("circle");
+
+  node.append("text")
+    .attr("x", 0)
+    .attr("y", d => d.type === "main" ? -14 : -10)
+    .attr("text-anchor", "middle")
+    .text(d => d.label);
+
+  simulation.on("tick", () => {
+    link
+      .attr("x1", d => d.source.x)
+      .attr("y1", d => d.source.y)
+      .attr("x2", d => d.target.x)
+      .attr("y2", d => d.target.y);
+
+    node.attr("transform", d => `translate(${d.x},${d.y})`);
+  });
+
+  function dragstarted(event, d) {
+    if (!event.active) simulation.alphaTarget(0.2).restart();
+    d.fx = d.x;
+    d.fy = d.y;
+  }
+
+  function dragged(event, d) {
+    d.fx = event.x;
+    d.fy = event.y;
+  }
+
+  function dragended(event, d) {
+    if (!event.active) simulation.alphaTarget(0);
+    d.fx = null;
+    d.fy = null;
+  }
+
+  // --- Info panel wiring ---
+  const infoPanel = document.getElementById("info-panel");
+
+  function setInfo(nodeData) {
+    infoPanel.innerHTML = "";
+    const title = document.createElement("h2");
+    title.textContent = "Node Details";
+    infoPanel.appendChild(title);
+
+    const badgeRow = document.createElement("div");
+    const badge = document.createElement("span");
+    badge.className = "badge " + (nodeData.type === "main" ? "main" : "sub");
+    badge.textContent = nodeData.type === "main" ? "Main Engine Node" : "Sub‑Component";
+    badgeRow.appendChild(badge);
+    infoPanel.appendChild(badgeRow);
+
+    const labelLabel = document.createElement("div");
+    labelLabel.className = "label";
+    labelLabel.textContent = "Label";
+    infoPanel.appendChild(labelLabel);
+
+    const labelValue = document.createElement("div");
+    labelValue.className = "value";
+    labelValue.textContent = nodeData.label;
+    infoPanel.appendChild(labelValue);
+
+    const idLabel = document.createElement("div");
+    idLabel.className = "label";
+    idLabel.textContent = "ID";
+    infoPanel.appendChild(idLabel);
+
+    const idValue = document.createElement("div");
+    idValue.className = "value";
+    idValue.textContent = nodeData.id;
+    infoPanel.appendChild(idValue);
+
+    if (nodeData.type === "sub" && nodeData.parentId) {
+      const parentLabel = document.createElement("div");
+      parentLabel.className = "label";
+      parentLabel.textContent = "Parent Engine Node";
+      infoPanel.appendChild(parentLabel);
+
+      const parentValue = document.createElement("div");
+      parentValue.className = "value";
+      const parentNode = nodeMap.get(nodeData.parentId);
+      parentValue.textContent = parentNode ? `${parentNode.label} (${parentNode.id})` : nodeData.parentId;
+      infoPanel.appendChild(parentValue);
+    }
+
+    // Local metrics: degree, in/out
+    const inLinks = links.filter(l => l.target.id === nodeData.id);
+    const outLinks = links.filter(l => l.source.id === nodeData.id);
+
+    const metricsTitle = document.createElement("div");
+    metricsTitle.className = "label";
+    metricsTitle.textContent = "Local Graph Metrics";
+    infoPanel.appendChild(metricsTitle);
+
+    const m1 = document.createElement("div");
+    m1.className = "metric";
+    m1.innerHTML = `<span>In‑Degree</span><span class="value">${inLinks.length}</span>`;
+    infoPanel.appendChild(m1);
+
+    const m2 = document.createElement("div");
+    m2.className = "metric";
+    m2.innerHTML = `<span>Out‑Degree</span><span class="value">${outLinks.length}</span>`;
+    infoPanel.appendChild(m2);
+
+    const m3 = document.createElement("div");
+    m3.className = "metric";
+    m3.innerHTML = `<span>Total Degree</span><span class="value">${inLinks.length + outLinks.length}</span>`;
+    infoPanel.appendChild(m3);
+
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "Drag nodes to re‑arrange. Dashed edges show pipeline flow between main engine nodes; solid edges show containment of sub‑components.";
+    infoPanel.appendChild(hint);
+  }
+
+  node.on("mouseover", (event, d) => setInfo(d));
+  node.on("click", (event, d) => setInfo(d));
+
+  // Initial info: show first main node
+  const firstMain = nodes.find(n => n.type === "main") || nodes[0];
+  if (firstMain) setInfo(firstMain);
+
+  // Resize handling
+  window.addEventListener("resize", () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight - 40;
+    svg.attr("viewBox", [0, 0, w, h]);
+    simulation.force("center", d3.forceCenter(w / 2, h / 2));
+    simulation.alpha(0.5).restart();
+  });
+</script>
+</body>
+</html>
