@@ -422,6 +422,9 @@ const clusterPalette = [
   "#facc15"
 ];
 
+const clusterHullLayer = svg.append("g")
+  .attr("class", "fractal-cluster-hulls");
+
 function clusterColor(clusterId: number | undefined) {
   if (clusterId == null) return "#9ca3af";
   return clusterPalette[clusterId % clusterPalette.length];
