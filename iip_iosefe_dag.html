@@ -543,6 +543,11 @@ function edgeGlow(roughness) {
     .attr("fill", "#4b5563")
     .attr("fill-opacity", 0.7);
 
+  const blur = defs.append("filter")
+  .attr("id", "fractal-blur")
+  .append("feGaussianBlur")
+  .attr("stdDeviation", 18);
+
   const simulation = d3.forceSimulation(nodes)
     .force("link", d3.forceLink(links)
       .id(d => d.id)
