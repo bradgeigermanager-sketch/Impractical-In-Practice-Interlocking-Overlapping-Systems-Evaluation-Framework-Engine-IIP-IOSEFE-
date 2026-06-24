@@ -442,6 +442,15 @@ nodes.forEach(n => {
     node.attr("transform", d => `translate(${d.x},${d.y})`);
   });
 
+  links.forEach(link => {
+  link.fractal = {
+    fractalDimension: null,
+    selfSimilarityIndex: null,
+    boundaryRoughness: null,
+    fractalInstabilityIndex: null
+  };
+});
+  
   function dragstarted(event, d) {
     if (!event.active) simulation.alphaTarget(0.2).restart();
     d.fx = d.x;
