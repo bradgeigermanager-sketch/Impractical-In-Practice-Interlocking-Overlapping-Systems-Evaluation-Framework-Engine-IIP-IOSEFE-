@@ -382,6 +382,21 @@ function renderFractalCorrelationLines() {
   sel.exit().remove();
 }
 
+const clusterPalette = [
+  "#22c55e",
+  "#3b82f6",
+  "#f97316",
+  "#e11d48",
+  "#a855f7",
+  "#14b8a6",
+  "#facc15"
+];
+
+function clusterColor(clusterId: number | undefined) {
+  if (clusterId == null) return "#9ca3af";
+  return clusterPalette[clusterId % clusterPalette.length];
+}
+
 // Attach fractal metrics placeholder to each node
 nodes.forEach(n => {
   n.fractal = {
