@@ -397,6 +397,9 @@ function clusterColor(clusterId: number | undefined) {
   return clusterPalette[clusterId % clusterPalette.length];
 }
 
+node.select("circle")
+  .attr("fill", d => clusterColor(d.fractalClusterId));
+  
 // Attach fractal metrics placeholder to each node
 nodes.forEach(n => {
   n.fractal = {
