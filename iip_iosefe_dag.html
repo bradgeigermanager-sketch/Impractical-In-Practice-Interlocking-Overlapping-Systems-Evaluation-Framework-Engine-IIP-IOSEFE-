@@ -555,6 +555,14 @@ addMetric("Fractal Instability Index (FII)", nodeData.fractal.fractalInstability
 }
 
 node.select("circle").attr("fill", d => fractalColor(d.fractal.fractalInstabilityIndex));
+
+    node.append("circle")
+  .attr("class", "fractal-halo")
+  .attr("r", d => d.fractal.fractalInstabilityIndex ? 20 : 0)
+  .attr("stroke", "#38bdf8")
+  .attr("stroke-width", 0.8)
+  .attr("fill", "none")
+  .attr("opacity", d => Math.min(0.4, d.fractal.fractalInstabilityIndex || 0));
     
     // Local metrics: degree, in/out
     const inLinks = links.filter(l => l.target.id === nodeData.id);
