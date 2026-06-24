@@ -292,6 +292,31 @@ nodes.forEach(n => {
   };
   }
 
+  function computeNodeStructuralInputs(node, nodes, links) {
+  const subcomponents = nodes.filter(n => n.parentId === node.id).length;
+
+  const outgoing = links.filter(l => l.source.id === node.id).length;
+  const incoming = links.filter(l => l.target.id === node.id).length;
+
+  const degree = outgoing + incoming;
+
+  const children = nodes.filter(n => n.parentId === node.id);
+  const childDegrees = children.map(c =>
+    links.filter(l => l.source.id === c.id || l.target.id === c.id).length
+  );
+
+  const avgChildDegree =
+    childDegrees.length > 0
+      ? childDegrees.reduce((a, b) => a + b, 0) / childDegrees.length
+      : 0;
+
+  return {
+    subcomponents,
+    degree,
+    avgChildDegree
+  };
+  }
+
   function renderFractalHeatmap() {
   const { min, max } = computeGlobalFractalField(nodes, links);
 
