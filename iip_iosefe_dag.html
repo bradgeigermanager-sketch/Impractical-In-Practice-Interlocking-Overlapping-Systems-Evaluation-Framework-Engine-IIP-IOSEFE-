@@ -310,6 +310,23 @@ nodes.forEach(n => {
     return nodeMap.get(id);
   }
 
+  nodes.forEach(node => {
+  const { scales, counts, patterns, boundaryLengths } =
+    generateFractalInputsForNode(node);
+
+  const metrics = computeFractalMetrics(
+    scales,
+    counts,
+    patterns,
+    boundaryLengths,
+    1.0, // alpha
+    1.0, // beta
+    1.0  // gamma
+  );
+
+  node.fractal = metrics;
+});
+  
   rows.forEach(row => {
     const mainId = row.NodeID;
     const mainName = row.NodeName;
