@@ -542,6 +542,34 @@ function edgeGlow(roughness) {
   return { scales, counts, patterns, boundaryLengths };
   }
 
+  function generateFractalInputsForNode(node, nodes, links) {
+  const s = computeNodeStructuralInputs(node, nodes, links);
+
+  const scales = [1.0, 0.5, 0.25, 0.125];
+
+  const counts = scales.map(scale =>
+    Math.max(1, Math.floor((s.subcomponents + s.degree + 1) * (1 / scale)))
+  );
+
+  const patterns = scales.map((scale, i) => ({
+    scale,
+    features: [
+      s.subcomponents * scale,
+      s.degree * (1 - scale),
+      s.avgChildDegree * (i + 1) * 0.1
+    ]
+  }));
+
+  const boundaryLengths = [
+    s.degree + 1,
+    s.degree + 1.4,
+    s.degree + 2.1,
+    s.degree + 2.8
+  ];
+
+  return { scales, counts, patterns, boundaryLengths };
+  }
+
   // --- Update meta counts ---
   document.getElementById("meta-nodes").textContent = nodes.length;
   document.getElementById("meta-edges").textContent = links.length;
