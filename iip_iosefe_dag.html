@@ -274,6 +274,49 @@ function renderFractalCorrelationLines() {
     }
   }
 
+  function computeFractalCorrelationClusters(nodes, links, threshold = 0.75) {
+  const entities = nodes; // cluster nodes only (you can extend to edges if desired)
+  const vectors = entities.map(e => fractalVector(e));
+
+  const n = entities.length;
+  const adj: number[][] = Array.from({ length: n }, () => []);
+
+  for (let i = 0; i < n; i++) {
+    for (let j = i + 1; j < n; j++) {
+      const corr = correlation(vectors[i], vectors[j]);
+      if (corr >= threshold) {
+        adj[i].push(j);
+        adj[j].push(i);
+      }
+    }
+  }
+
+  const visited = new Array(n).fill(false);
+  const clusters: number[][] = [];
+
+  for (let i = 0; i < n; i++) {
+    if (visited[i]) continue;
+    const stack = [i];
+    const cluster: number[] = [];
+    visited[i] = true;
+
+    while (stack.length) {
+      const v = stack.pop()!;
+      cluster.push(v);
+      for (const nb of adj[v]) {
+        if (!visited[nb]) {
+          visited[nb] = true;
+          stack.push(nb);
+        }
+      }
+    }
+
+    clusters.push(cluster);
+  }
+
+  return { entities, clusters };
+  }
+
   function renderCorrelationHalos() {
   const { entities, matrix } = computeFractalCorrelationMatrix(nodes, links);
 
