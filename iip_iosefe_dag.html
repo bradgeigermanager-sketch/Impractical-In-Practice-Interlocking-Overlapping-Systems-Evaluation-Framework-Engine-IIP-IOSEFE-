@@ -274,6 +274,17 @@ function renderFractalCorrelationLines() {
     }
   }
 
+  function assignFractalClusters(nodes, links, threshold = 0.75) {
+  const { entities, clusters } = computeFractalCorrelationClusters(nodes, links, threshold);
+
+  clusters.forEach((cluster, idx) => {
+    cluster.forEach(i => {
+      const node = entities[i];
+      node.fractalClusterId = idx;
+    });
+  });
+  }
+
   function computeFractalCorrelationClusters(nodes, links, threshold = 0.75) {
   const entities = nodes; // cluster nodes only (you can extend to edges if desired)
   const vectors = entities.map(e => fractalVector(e));
