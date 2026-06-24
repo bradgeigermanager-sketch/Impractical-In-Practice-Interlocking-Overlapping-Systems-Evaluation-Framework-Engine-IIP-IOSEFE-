@@ -525,6 +525,26 @@ nodes.forEach(n => {
       const parentNode = nodeMap.get(nodeData.parentId);
       parentValue.textContent = parentNode ? `${parentNode.label} (${parentNode.id})` : nodeData.parentId;
       infoPanel.appendChild(parentValue);
+
+      // FRACTAL METRICS
+const fractalHeader = document.createElement("div");
+fractalHeader.className = "label";
+fractalHeader.textContent = "Fractal Metrics";
+infoPanel.appendChild(fractalHeader);
+
+function addMetric(label, value) {
+  const row = document.createElement("div");
+  row.className = "metric";
+  row.innerHTML = `<span>${label}</span><span class="value">${
+    value === null ? "—" : value.toFixed(4)
+  }</span>`;
+  infoPanel.appendChild(row);
+}
+
+addMetric("Fractal Dimension (Dᶠ)", nodeData.fractal.fractalDimension);
+addMetric("Self-Similarity Index (SSI)", nodeData.fractal.selfSimilarityIndex);
+addMetric("Boundary Roughness (Bᵣ)", nodeData.fractal.boundaryRoughness);
+addMetric("Fractal Instability Index (FII)", nodeData.fractal.fractalInstabilityIndex);
     }
 
     // Local metrics: degree, in/out
