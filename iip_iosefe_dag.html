@@ -343,6 +343,23 @@ nodes.forEach(n => {
     });
   });
 
+  links.forEach(edge => {
+  const { scales, counts, patterns, boundaryLengths } =
+    generateFractalInputsForEdge(edge);
+
+  const metrics = computeFractalMetrics(
+    scales,
+    counts,
+    patterns,
+    boundaryLengths,
+    1.0,
+    1.0,
+    1.0
+  );
+
+  edge.fractal = metrics;
+});
+
   // --- Impose a coarse DAG ordering between main nodes (pipeline order) ---
   const mainOrder = [
     "ING-01",
