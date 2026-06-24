@@ -547,6 +547,15 @@ addMetric("Boundary Roughness (Bᵣ)", nodeData.fractal.boundaryRoughness);
 addMetric("Fractal Instability Index (FII)", nodeData.fractal.fractalInstabilityIndex);
     }
 
+    function fractalColor(fii) {
+  if (fii === null) return "#6b7280"; // neutral gray
+  if (fii < 0.5) return "#22c55e";    // stable → green
+  if (fii < 1.0) return "#facc15";    // semi-stable → yellow
+  return "#ef4444";                   // unstable → red
+}
+
+node.select("circle").attr("fill", d => fractalColor(d.fractal.fractalInstabilityIndex));
+    
     // Local metrics: degree, in/out
     const inLinks = links.filter(l => l.target.id === nodeData.id);
     const outLinks = links.filter(l => l.source.id === nodeData.id);
