@@ -358,6 +358,43 @@ function renderFractalCorrelationLines() {
   return lower.concat(upper);
   }
 
+  function renderClusterHulls() {
+  const clustersById: Record<number, any[]> = {};
+
+  nodes.forEach(n => {
+    if (n.fractalClusterId == null) return;
+    if (!clustersById[n.fractalClusterId]) clustersById[n.fractalClusterId] = [];
+    clustersById[n.fractalClusterId].push(n);
+  });
+
+  const hullData = Object.entries(clustersById)
+    .map(([id, members]) => {
+      const pts = members
+        .filter(m => m.x != null && m.y != null)
+        .map(m => ({ x: m.x, y: m.y }));
+      const hull = convexHull(pts);
+      return hull ? { id: Number(id), hull } : null;
+    })
+    .filter(Boolean) as { id: number; hull: { x: number; y: number }[] }[];
+
+  const sel = clusterHullLayer.selectAll("path")
+    .data(hullData, d => d.id);
+
+  sel.enter()
+    .append("path")
+    .attr("fill", d => clusterColor(d.id).replace(")", ",0.10)").replace("rgb", "rgba"))
+    .attr("stroke", d => clusterColor(d.id))
+    .attr("stroke-width", 1)
+    .attr("d", d => "M" + d.hull.map(p => `${p.x},${p.y}`).join("L") + "Z");
+
+  sel
+    .attr("fill", d => clusterColor(d.id).replace(")", ",0.10)").replace("rgb", "rgba"))
+    .attr("stroke", d => clusterColor(d.id))
+    .attr("d", d => "M" + d.hull.map(p => `${p.x},${p.y}`).join("L") + "Z");
+
+  sel.exit().remove();
+  }
+
   function renderCorrelationHalos() {
   const { entities, matrix } = computeFractalCorrelationMatrix(nodes, links);
 
