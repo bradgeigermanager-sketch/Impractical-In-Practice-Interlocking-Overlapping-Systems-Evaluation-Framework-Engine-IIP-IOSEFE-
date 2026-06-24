@@ -588,6 +588,11 @@ function edgeGlow(roughness) {
       .attr("y2", d => d.target.y);
 
     node.attr("transform", d => `translate(${d.x},${d.y})`);
+
+    simulation.on("tick", () => {
+  renderFractalHeatmap();
+  // existing node/edge updates...
+});
   });
 
   links.forEach(link => {
