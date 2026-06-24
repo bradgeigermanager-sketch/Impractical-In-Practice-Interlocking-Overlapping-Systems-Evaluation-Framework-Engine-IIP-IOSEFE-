@@ -262,6 +262,13 @@ nodes.forEach(n => {
   };
 });
 
+  function fractalNoise(x, y, scale = 0.005) {
+  return (
+    Math.sin((x * scale) + Math.cos(y * scale * 0.7)) *
+    Math.cos((y * scale) + Math.sin(x * scale * 0.4))
+  );
+  }
+
   function computeGlobalFractalField(nodes, links) {
   const values = [];
 
