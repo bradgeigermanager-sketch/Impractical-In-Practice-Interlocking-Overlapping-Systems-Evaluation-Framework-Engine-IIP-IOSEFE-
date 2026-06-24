@@ -274,6 +274,37 @@ function renderFractalCorrelationLines() {
     }
   }
 
+  function renderCorrelationHalos() {
+  const { entities, matrix } = computeFractalCorrelationMatrix(nodes, links);
+
+  const halos = nodes.map((node, i) => {
+    const correlations = matrix[i];
+    const avgCorr = correlations.reduce((a, b) => a + b, 0) / correlations.length;
+    return { node, avgCorr };
+  });
+
+  const sel = svg.selectAll(".correlation-halo")
+    .data(halos, d => d.node.id);
+
+  sel.enter()
+    .append("circle")
+    .attr("class", "correlation-halo")
+    .attr("r", d => 18 + d.avgCorr * 20)
+    .attr("fill", "none")
+    .attr("stroke", d => `rgba(147,51,234,${d.avgCorr * 0.3})`)
+    .attr("stroke-width", 1.5)
+    .attr("cx", d => d.node.x)
+    .attr("cy", d => d.node.y);
+
+  sel
+    .attr("r", d => 18 + d.avgCorr * 20)
+    .attr("stroke", d => `rgba(147,51,234,${d.avgCorr * 0.3})`)
+    .attr("cx", d => d.node.x)
+    .attr("cy", d => d.node.y);
+
+  sel.exit().remove();
+  }
+
   const sel = correlationLayer.selectAll("line")
     .data(lines, d => `${d.a.id}-${d.b.id}`);
 
