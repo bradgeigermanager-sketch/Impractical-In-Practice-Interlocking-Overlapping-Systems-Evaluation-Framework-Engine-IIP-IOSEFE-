@@ -254,6 +254,49 @@ import {
   boundaryRoughness
 } from "./fractalMathEngine.js";
 
+function renderFractalCorrelationLines() {
+  const { entities, matrix } = computeFractalCorrelationMatrix(nodes, links);
+
+  const threshold = 0.75; // adjustable
+
+  const lines = [];
+
+  for (let i = 0; i < entities.length; i++) {
+    for (let j = i + 1; j < entities.length; j++) {
+      const corr = matrix[i][j];
+      if (corr >= threshold) {
+        const a = entities[i];
+        const b = entities[j];
+        if (a.x && b.x) {
+          lines.push({ a, b, corr });
+        }
+      }
+    }
+  }
+
+  const sel = correlationLayer.selectAll("line")
+    .data(lines, d => `${d.a.id}-${d.b.id}`);
+
+  sel.enter()
+    .append("line")
+    .attr("stroke", d => `rgba(56,189,248,${d.corr * 0.4})`)
+    .attr("stroke-width", d => 1 + d.corr * 2)
+    .attr("x1", d => d.a.x)
+    .attr("y1", d => d.a.y)
+    .attr("x2", d => d.b.x)
+    .attr("y2", d => d.b.y);
+
+  sel
+    .attr("stroke", d => `rgba(56,189,248,${d.corr * 0.4})`)
+    .attr("stroke-width", d => 1 + d.corr * 2)
+    .attr("x1", d => d.a.x)
+    .attr("y1", d => d.a.y)
+    .attr("x2", d => d.b.x)
+    .attr("y2", d => d.b.y);
+
+  sel.exit().remove();
+}
+
 // Attach fractal metrics placeholder to each node
 nodes.forEach(n => {
   n.fractal = {
