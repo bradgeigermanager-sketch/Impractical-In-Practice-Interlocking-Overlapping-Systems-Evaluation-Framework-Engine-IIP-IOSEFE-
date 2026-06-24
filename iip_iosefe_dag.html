@@ -292,6 +292,45 @@ nodes.forEach(n => {
   };
   }
 
+  function renderFractalHeatmap() {
+  const { min, max } = computeGlobalFractalField(nodes, links);
+
+  const cellSize = 40; // adjustable resolution
+  const cols = Math.ceil(width / cellSize);
+  const rows = Math.ceil(height / cellSize);
+
+  const data = [];
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const x = c * cellSize;
+      const y = r * cellSize;
+
+      const noise = fractalNoise(x, y);
+      const mapped = min + (max - min) * ((noise + 1) / 2);
+
+      data.push({ x, y, value: mapped });
+    }
+  }
+
+  const cells = heatmapLayer.selectAll("rect")
+    .data(data, d => `${d.x}-${d.y}`);
+
+  cells.enter()
+    .append("rect")
+    .attr("x", d => d.x)
+    .attr("y", d => d.y)
+    .attr("width", cellSize)
+    .attr("height", cellSize)
+    .attr("fill", d => heatmapColor(d.value, min, max))
+    .attr("stroke", "none");
+
+  cells
+    .attr("fill", d => heatmapColor(d.value, min, max));
+
+  cells.exit().remove();
+  }
+
   function edgeColor(fii) {
   if (fii === null) return "#4b5563";
   if (fii < 0.4) return "#22c55e";   // stable
