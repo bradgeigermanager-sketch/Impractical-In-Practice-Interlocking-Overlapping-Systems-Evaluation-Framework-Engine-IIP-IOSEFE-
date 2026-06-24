@@ -180,6 +180,8 @@
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
   // --- CSV representation of the DAG (nodes + sub-components) ---
+  const heatmapLayer = svg.append("g")
+  .attr("class", "fractal-heatmap-layer");
   const csvData = `
 NodeID,NodeName,SubComponentID,SubComponentName
 ING-01,System Ingestion Layer,ING-01-01,Raw System Definition Loader
